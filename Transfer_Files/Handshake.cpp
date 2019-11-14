@@ -35,13 +35,33 @@ void setup(){
 void reader(){
     char myArray[20];
     if (Serial.available()>0){
-        uint8_t byte_read =Serial.read();
-            Serial3.write(byte_read);
+        uint32_t byte_read =Serial.read();
+        uinnt32_to_serial3(byte_read);
+
     }
     if (Serial3.available() > 0) {
-      uint8_t byte_read = Serial3.read();
-      Serial.write(byte_read);
+      uinnt32_from_serial3();
 }
+}
+/* * Writes an uint32_t to Serial3 , starting from the least - significant
+* and finishing with the most significant byte .
+*/
+void uinnt32_to_serial3 (uint32_t num) {
+    Serial3 . write (( char ) ( num >> 0) ) ;
+    Serial3 . write (( char ) ( num >> 8) ) ;
+    Serial3 . write (( char ) ( num >> 16) ) ;
+    Serial3 . write (( char ) ( num >> 24) ) ;
+}
+/* * Reads an uint32_t from Serial3 , starting from the least - significant
+* and finishing with the most significant byte .
+*/
+uint32_t uinnt32_from_serial3 () {
+uint32_t num = 0;
+num = num | (( uint32_t ) Serial3 . read () ) << 0;
+num = num | (( uint32_t ) Serial3 . read () ) << 8;
+num = num | (( uint32_t ) Serial3 . read () ) << 16;
+num = num | (( uint32_t ) Serial3 . read () ) << 24;
+return num ;
 }
 int main(){
     setup();
