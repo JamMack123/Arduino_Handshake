@@ -52,22 +52,24 @@ num = num | (( uint32_t ) Serial3.read () ) << 16;
 num = num | (( uint32_t ) Serial3.read () ) << 24;
 return num ;
 }
-// uint32_t encryption(uint32_t val){
-//     uint32_t x; 
 
-// }
+
 void reader(){
     char myArray[20];
     if (Serial.available()>0){
-        if (Serial.read() == 13){
-            Serial3.print("\n\r");
-        }
         uint32_t byte_read =Serial.read();
+        if (byte_read == 13){
+            Serial3.write("\r\n");
+            Serial.write("\r\n");
+        }
         uinnt32_to_serial3(byte_read);
-
+        Serial.write(byte_read);
     }
+
+
     if (Serial3.available() > 0) {
       Serial.write(uinnt32_from_serial3());
+
 }
 }
 
