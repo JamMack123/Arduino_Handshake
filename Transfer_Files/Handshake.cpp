@@ -2,7 +2,7 @@
 uint32_t d = 0;
 uint32_t n = 0;
 uint32_t e = 0;
-uint32_t m = 0;
+uint32_t m = 0
 
 void setup(){
     int val;
