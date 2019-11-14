@@ -34,18 +34,14 @@ void setup(){
 }
 void reader(){
     char myArray[20];
-    if (Serial.available()>=1){
-        int numBytes =Serial.readBytes(myArray, 1);
-        for(int i = 0; i < numBytes; i++){
-            Serial3.write(myArray[i]);
-        }
+    if (Serial.available()>0){
+        uint8_t byte_read =Serial.read();
+            Serial3.write(byte_read);
     }
-    if (Serial3.available()>=1){
-        int numBytes =Serial.readBytes(myArray, 1);
-        for(int i = 0; i < numBytes; i++){
-            Serial.print(myArray[i]);
-        }
-    }
+    if (Serial3.available() > 0) {
+      uint8_t byte_read = Serial3.read();
+      Serial.write(byte_read);
+}
 }
 int main(){
     setup();
