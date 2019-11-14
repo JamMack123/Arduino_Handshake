@@ -37,16 +37,14 @@ void reader(){
     if (Serial.available()>=1){
         int numBytes =Serial.readBytes(myArray, 1);
         for(int i = 0; i < numBytes; i++){
-            Serial3.print(myArray[i]);
+            Serial3.write(myArray[i]);
         }
-        Serial3.println();
     }
     if (Serial3.available()>=1){
         int numBytes =Serial.readBytes(myArray, 1);
         for(int i = 0; i < numBytes; i++){
             Serial.print(myArray[i]);
         }
-        Serial.println();
     }
 }
 int main(){
