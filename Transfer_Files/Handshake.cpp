@@ -52,10 +52,10 @@ num = num | (( uint32_t ) Serial3.read () ) << 16;
 num = num | (( uint32_t ) Serial3.read () ) << 24;
 return num ;
 }
-uint32_t encryption(uint32_t val){
-    uint32_t x = 
+// uint32_t encryption(uint32_t val){
+//     uint32_t x; 
 
-}
+// }
 void reader(){
     char myArray[20];
     if (Serial.available()>0){
