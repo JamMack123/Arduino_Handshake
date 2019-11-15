@@ -97,13 +97,15 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
             Serial3.write(encypted2);
         }
         tempByte = powMod(byte_read,e,m);
-        uinnt32_to_serial3(tempByte);
+        Serial3.write(tempByte);
         Serial.write(byte_read);
     }
     if (Serial3.available() > 0)
     {
-        tempByte = powMod(uinnt32_from_serial3(),d,n); 
-        Serial.write(tempByte);
+        // uint32_t bit = uinnt32_from_serial3();
+        Serial.print(Serial3.read());
+        // tempByte = powMod(bit,d,n); 
+        // Serial.print(tempByte);
 
     }
 }
