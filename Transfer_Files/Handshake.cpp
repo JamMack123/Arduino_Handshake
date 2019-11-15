@@ -1,31 +1,12 @@
 #include <Arduino.h>
 
-int setup(uint32_t someValue)
+void setup()
 {
-    int val;
     init();
     Serial.begin(9600);
     Serial3.begin(9600);
     pinMode(13, INPUT);
     digitalWrite(13, LOW);
-    //Determines if it is server or client
-    val = digitalRead(13);
-    if (val == 1)
-    {
-        Serial.println("Arduino chat: Server!");
-        // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
-
-
-    }
-    if (val == 0)
-    {
-        Serial.println("Arduino chat: Client!");
-        // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
-
-    }
-    return val;
 }
 uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m)
 {
@@ -106,7 +87,6 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
         //Sends inputted text to Serial 3 after encyrption
         tempByte = powMod(byte_read, e, m);
         uinnt32_to_serial3(tempByte);
-        // print unencrypted byte to serial moniter
         Serial.write(byte_read);
     }
     if (Serial3.available() >= 4)
@@ -122,8 +102,20 @@ int main()
 {
     //We could not get a val from setup without passing some
     uint32_t somethingToPass = 0;
-    int val = setup(somethingToPass);
-
+    setup();
+    uint32_t val =digitalRead(13);
+    if (val == 1)
+    {
+        Serial.println("Arduino chat: Server!");
+        // For some reason we need this delay IT IS SACRED CODE!
+        delay(20);
+    }
+    if (val == 0)
+    {
+        Serial.println("Arduino chat: Client!");
+        // For some reason we need this delay IT IS SACRED CODE!
+        delay(20);
+    }
     //Creates a loop to infinetly read from the serial monitors
     while (true)
     {
