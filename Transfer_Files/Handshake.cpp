@@ -43,10 +43,11 @@ uint32_t sum= 0;
         a>>=1;
         b = b*2%m;
     }
+    return sum%m;
 }
-uint32_t powMod( uint32_t e, uint32_t value, uint32_t modulus){
+uint32_t powMod(uint32_t value,uint32_t e, uint32_t modulus,  uint32_t ans = 1 ){
     //Intalized as 1 so subsequent multiplications do not fail
-   uint32_t ans = 1; 
+  
    while (e != 0){
         if (e & 1 != 0){
             ans = mulmod(ans,value,modulus);
@@ -83,23 +84,26 @@ uint32_t uinnt32_from_serial3 ()
 
 void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
 {
+    uint32_t tempByte = 0;
     if (Serial.available() > 0)
     {
         uint32_t byte_read = Serial.read();
         if (byte_read == 13)
         {
             Serial.write("\r\n");
-            uint32_t encypted1 = powMod(e,13,m);
-            uint32_t encypted2 = powMod(e,10,m);
+            uint32_t encypted1 = powMod(13,e,m);
+            uint32_t encypted2 = powMod(10,e,m);
             Serial3.write(encypted1);
             Serial3.write(encypted2);
         }
-        uinnt32_to_serial3(powMod(e,byte_read,m));
+        tempByte = powMod(byte_read,e,m);
+        uinnt32_to_serial3(tempByte);
         Serial.write(byte_read);
     }
     if (Serial3.available() > 0)
     {
-        Serial.write(powMod(d,uinnt32_from_serial3(),n) );
+        tempByte = powMod(uinnt32_from_serial3(),d,n); 
+        Serial.write(tempByte);
 
     }
 }
