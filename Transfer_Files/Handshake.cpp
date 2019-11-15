@@ -1,10 +1,12 @@
 #include <Arduino.h>
-uint32_t d = 0;
-uint32_t n = 0;
-uint32_t e = 0;
-uint32_t m = 0;
+uint32_t serverPublicKey = 7;
+uint32_t serverPrivateKey =27103;
+uint32_t serverModulus = 95477;
+uint32_t clientPublicKey = 11;
+uint32_t clientPrivateKey =38291;
+uint32_t clinetModulus = 84823;
 
-void setup()
+int setup(uint32_t d)
 {
     int val;
     init();
@@ -18,10 +20,7 @@ void setup()
         Serial.println("Arduino chat: Server!");
         // For some reason we need this delay IT IS SACRED CODE!
         delay(20);
-        d = 27103;
-        n = 95477;
-        e = 11;
-        m = 84823;
+   
 
     }
     if (val == 0)
@@ -29,11 +28,9 @@ void setup()
         Serial.println("Arduino chat: Client!");
         // For some reason we need this delay IT IS SACRED CODE!
         delay(20);
-        d = 38291;
-        n = 84823;
-        e = 7;
-        m = 95477;
+
     }
+    return val;
 }
 uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m){
 uint32_t sum= 0;
@@ -84,17 +81,18 @@ uint32_t uinnt32_from_serial3 ()
 }
 
 
-void reader()
+void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
 {
-    char myArray[20];
     if (Serial.available() > 0)
     {
         uint32_t byte_read = Serial.read();
         if (byte_read == 13)
         {
             Serial.write("\r\n");
-            //Add the ASCII VALUE 10 and 13 to get encypted then sent to
-            // the serial3
+            uint32_t encypted1 = encryptDecyrpt(e,13,m);
+            uint32_t encypted2 = encryptDecyrpt(e,10,m);
+            Serial3.write(encypted1);
+            Serial3.write(encypted2);
         }
         uinnt32_to_serial3(byte_read);
         Serial.write(byte_read);
@@ -108,10 +106,26 @@ void reader()
 
 int main()
 {
-    setup();
+    //We could not get a val from setup without passing some
+    uint32_t somethingToPass =0;
+    int val = setup(somethingToPass);
+
     //Creates a loop to infinetly read from the serial monitors
     while (true)
     {
-        reader();
+    if (val==1){
+       uint32_t d1 = 27103;
+       uint32_t n1 = 95477;
+       uint32_t e1 = 11;
+       uint32_t m1 = 84823;
+       reader(e1,d1,m1,n1);
+    }else{
+        uint32_t d1 = 38291;
+        uint32_t n1 = 84823;
+        uint32_t e1 = 7;
+        uint32_t m1 = 95477;
+        reader(e1,d1,m1,n1);
+    }
+        
     }
 }
