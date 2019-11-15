@@ -1,40 +1,4 @@
-#include <Arduino.h>
-uint32_t serverPublicKey = 7;
-uint32_t serverPrivateKey =27103;
-uint32_t serverModulus = 95477;
-uint32_t clientPublicKey = 11;
-uint32_t clientPrivateKey =38291;
-uint32_t clinetModulus = 84823;
-
-int setup(uint32_t d)
-{
-    int val;
-    init();
-    Serial.begin(9600);
-    Serial3.begin(9600);
-    pinMode(13, INPUT);
-    digitalWrite(13, LOW);
-    val = digitalRead(13);
-    if (val == 1)
-    {
-        Serial.println("Arduino chat: Server!");
-        // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
-   
-
-    }
-    if (val == 0)
-    {
-        Serial.println("Arduino chat: Client!");
-        // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
-
-    }
-    return val;
-}
-uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m){
-uint32_t sum= 0;
-//Keeps removing least significant bit of a until no bits remain
+/Keeps removing least significant bit of a until no bits remain
 // If the ith bit in a is 1 it will add b*2^i to the sum mation
     while(a!=0){
         if (a&1){
@@ -44,7 +8,7 @@ uint32_t sum= 0;
         b = b*2%m;
     }
 }
-uint32_t encryptDecyrpt( uint32_t e, uint32_t value, uint32_t modulus){
+uint32_t powMod( uint32_t e, uint32_t value, uint32_t modulus){
     //Intalized as 1 so subsequent multiplications do not fail
    uint32_t ans = 1; 
    while (e != 0){
@@ -89,17 +53,17 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
         if (byte_read == 13)
         {
             Serial.write("\r\n");
-            uint32_t encypted1 = encryptDecyrpt(e,13,m);
-            uint32_t encypted2 = encryptDecyrpt(e,10,m);
+            uint32_t encypted1 = powMod(e,13,m);
+            uint32_t encypted2 = powMod(e,10,m);
             Serial3.write(encypted1);
             Serial3.write(encypted2);
         }
         uinnt32_to_serial3(byte_read);
-        Serial.write(byte_read);
+        Serial.write(powMod(e,byte_read,m));
     }
     if (Serial3.available() > 0)
     {
-        Serial.write(uinnt32_from_serial3());
+        Serial.write(encryptDecyrpt(e,uinnt32_from_serial3(),m) );
 
     }
 }
