@@ -23,10 +23,10 @@ Running instructions:
  	4. Open Serial moniters
 
 Wiring instructions:
-	server pin (13)<---->resistor<---->  5V
-	client pin (13)<----> resistor<----> ground
-    	server pin (TX3 14)<---->client pin (RX3 15)
-	server pin (RX3 15)<---->client pin (TX3 14)
+	server pin (13)<---->resistor<----> 5V
+	client pin (13)<----> resistor<---->ground
+    	server pin (TX3 14)<---->client pin(RX3 15)
+	server pin (RX3 15)<---->client pin(TX3 14)
 	server ground<---->client ground
    
 
