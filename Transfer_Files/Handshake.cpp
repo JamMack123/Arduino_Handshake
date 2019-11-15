@@ -99,8 +99,7 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
     }
     if (Serial3.available() > 0)
     {
-        Serial.write(powMod(e,uinnt32_from_serial3(),m) );
-
+        Serial.write(powMod(d,uinnt32_from_serial3(),m) );
     }
 }
 
