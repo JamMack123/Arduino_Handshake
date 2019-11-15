@@ -1,10 +1,4 @@
 #include <Arduino.h>
-uint32_t serverPublicKey = 7;
-uint32_t serverPrivateKey =27103;
-uint32_t serverModulus = 95477;
-uint32_t clientPublicKey = 11;
-uint32_t clientPrivateKey =38291;
-uint32_t clinetModulus = 84823;
 
 int setup(uint32_t d)
 {
@@ -45,9 +39,9 @@ uint32_t sum= 0;
     }
     return sum%m;
 }
-uint32_t powMod(uint32_t value,uint32_t e, uint32_t modulus,  uint32_t ans = 1 ){
+uint32_t powMod(uint32_t value,uint32_t e, uint32_t modulus){
     //Intalized as 1 so subsequent multiplications do not fail
-  
+   uint32_t ans = 1;
    while (e != 0){
         if (e & 1 != 0){
             ans = mulmod(ans,value,modulus);
@@ -93,19 +87,18 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
             Serial.write("\r\n");
             uint32_t encypted1 = powMod(13,e,m);
             uint32_t encypted2 = powMod(10,e,m);
-            Serial3.write(encypted1);
-            Serial3.write(encypted2);
+            uinnt32_to_serial3(encypted1);
+            uinnt32_to_serial3(encypted2);
         }
         tempByte = powMod(byte_read,e,m);
         uinnt32_to_serial3(tempByte);
         Serial.write(byte_read);
     }
-    if (Serial3.available() > 0)
+    if (Serial3.available() >=4)
     {
         uint32_t bit = uinnt32_from_serial3();
-        Serial3.flush();
         tempByte = powMod(bit,d,n); 
-        Serial.println(bit);
+        Serial.print(tempByteByte);
     }
 }
 
