@@ -98,7 +98,7 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
     {
         uint32_t bit = uinnt32_from_serial3();
         tempByte = powMod(bit,d,n); 
-        Serial.print(tempByteByte);
+        Serial.print(tempByte);
     }
 }
 
