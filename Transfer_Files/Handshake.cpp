@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-int setup(uint32_t d)
+int setup(uint32_t someValue)
 {
     int val;
     init();
