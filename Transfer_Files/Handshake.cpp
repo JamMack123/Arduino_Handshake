@@ -106,6 +106,7 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
         //Sends inputted text to Serial 3 after encyrption
         tempByte = powMod(byte_read, e, m);
         uinnt32_to_serial3(tempByte);
+        // print unencrypted byte to serial moniter
         Serial.write(byte_read);
     }
     if (Serial3.available() >= 4)
