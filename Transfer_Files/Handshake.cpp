@@ -11,8 +11,8 @@ void setup()
 uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m)
 {
     uint32_t sum = 0;
-    //Keeps removing least significant bit of a until no bits remain
-    // If the ith bit in a is 1 it will add b*2^i to the sum mation
+    // Keeps removing least significant bit of a until no bits remain
+    // If the ith bit in a is 1 it will add b*2^i to the summation
     while(a != 0)
     {
         if (a & 1)
@@ -20,10 +20,10 @@ uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m)
             sum += (b);
         }
         //Removes the least significant bit of a to decrease
-        //a total value
+        //a's total value accordingly
         a >>= 1;
-        //Multiplies b by 2 i times i being the number of bits
-        //in a
+        // Multiplies b by 2 i times, i being the number of bits
+        // in a
         b = b * 2 % m;
     }
     return sum % m;
