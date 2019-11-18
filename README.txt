@@ -9,7 +9,7 @@ Included files:
     README
     Makefile
 
-Compenents:
+Components:
  	2 Arduino Mega board
  	Breadboard
 	male to male wires
@@ -18,15 +18,15 @@ Compenents:
 
 Running instructions:
 	1. Connect and wire the arduinos
-	2. Compile with "make"
- 	3. Upload with "make upload"
- 	4. Open Serial moniters
+	2. Compile with "make" on each arduino
+ 	3. Upload with "make upload" on each arduino
+ 	4. Open each Serial monitor and begin inputting
 
 Wiring instructions:
-	server pin (13)<---->resistor<----> 5V
+	server pin (13)<---->resistor<---->5V
 	client pin (13)<----> resistor<---->ground
-    	server pin (TX3 14)<---->client pin(RX3 15)
-	server pin (RX3 15)<---->client pin(TX3 14)
+    	server pin(TX3 14)<---->client pin(RX3 15)
+	server pin(RX3 15)<---->client pin(TX3 14)
 	server ground<---->client ground
    
 
