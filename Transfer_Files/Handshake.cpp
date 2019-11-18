@@ -100,8 +100,6 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
 
 int main()
 {
-    //We could not get a val from setup without passing some
-    uint32_t somethingToPass = 0;
     setup();
     uint32_t val =digitalRead(13);
     if (val == 1)
