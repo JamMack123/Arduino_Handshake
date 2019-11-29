@@ -98,9 +98,10 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
     }
 }
 
-/*BEGGINING OF PART 2 CODE FUNCTION MPLEMENETATION
-************************
-*/
+/***********************************************
+BEGGINING OF PART 2 CODE FUNCTION IMPLEMENETATION
+************************************************/
+
 //Reads the o analog pin and uses the read value to randomly 
 //create a fifteen bit number
 uint32_t customRand(uint32_t k){
@@ -226,6 +227,62 @@ uint32_t keyGeneration(uint32_t& d, uint32_t& pubKey, uint32_t& n){
     }
     return d;
 }
+
+/**********************************************************************
+The following few functions relate to the intiale handshake between the
+Client and the server
+************************************************************************/
+
+/** Waits for a certain number of bytes on Serial3 or timeout
+* @param nbytes : the number of bytes we want
+* @param timeout : timeout period (ms); specifying a negative number
+* turns off timeouts (the function waits indefinitely
+* if timeouts are turned off).
+* @return True if the required number of bytes have arrived .
+*/
+bool wait_on_serial3 ( uint8_t nbytes, long timeout )
+{
+    unsigned long deadline = millis() + timeout ;// wraparound not a problem
+    while (Serial3.available() < nbytes && ( timeout < 0 || millis () < deadline ) )
+    {
+        delay (1) ; // be nice , no busy loop
+    }
+    return Serial3 . available () >= nbytes ;
+}
+
+//Code for client sided finite state machine handshake
+void clientShake(uint32_t cPKey, uint32_t cMod )
+{
+    enum clientState
+    {
+        sending, ready
+    };
+    clientState state = sending;
+    while (state != ready)
+    {
+        Serial.println("Sending keys ");
+        if (state == sending)
+        {
+            uinnt32_to_serial3('C');
+            uinnt32_to_serial3(cPKey);
+            uinnt32_to_serial3(cMod);
+            uint32_t time = millis();
+            wait_on_serial3(4, 1);
+
+            if (millis() - time >= 1000)
+            {
+                state = sending;
+            }
+            else if(uinnt32_from_serial3() == 'A')
+            {
+                state = ready;
+            }
+        }
+
+    }
+
+}
+
 int main()
 {
 
@@ -233,12 +290,13 @@ int main()
     uint32_t d =0;
     uint32_t pubKey =0;
     uint32_t n = 0;
+    uint32_t e =0;
+    uint32_t m =0;
     uint32_t val =digitalRead(13);
     if (val == 1)
     {
         Serial.println("Arduino chat: Server!");
         // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
         keyGeneration(d,pubKey,n);
         Serial.print("d = ");
         Serial.println(d);
@@ -252,7 +310,6 @@ int main()
     {
         Serial.println("Arduino chat: Client!");
         // For some reason we need this delay IT IS SACRED CODE!
-        delay(20);
         keyGeneration(d,pubKey,n);
         Serial.print("d = ");
         Serial.println(d);
