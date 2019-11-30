@@ -266,17 +266,10 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t& sPkey, uint32_t& sMod)
         //Serial.println("Sending keys ");
         if (state == sending)
         {
-
-
             Serial3.write('C');
-
             uinnt32_to_serial3(cPKey); 
-            Serial.println(cPKey);
             uinnt32_to_serial3(cMod);
-            Serial.println(cMod);
             wait_on_serial3(4,1000);
-           
-
             if(ack == 'A')
             {
                 Serial.println("A found");
@@ -294,6 +287,10 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t& sPkey, uint32_t& sMod)
                 state = ready;
                 
             }
+        }
+        if (state == ready){
+            Serial.println("Chat is Set. Enjoy your communictaion!");
+            delay(50);
         }
 
     }
@@ -439,7 +436,10 @@ int main()
         Serial.print("n = ");
         Serial.println(n);
         delay(50);
-        clientShake(pubKey, n);
+        clientShake(pubKey, n, e,m);
+        Serial.println(e);
+        Serial.println(m);
+        delay(50);
     }
  while (true)
     {
