@@ -251,39 +251,54 @@ bool wait_on_serial3 ( uint8_t nbytes, long timeout )
 }
 
 //Code for client sided finite state machine handshake
-void clientShake(uint32_t cPKey, uint32_t cMod )
+void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t& sPkey, uint32_t& sMod)
 {
     enum clientState
     {
         sending, ready
     };
+    uint32_t ack;
+    bool ackFound = false;
     clientState state = sending;
     while (state != ready)
     {
-        Serial.println("Sending keys ");
+         ack = uinnt32_from_serial3();
+        //Serial.println("Sending keys ");
         if (state == sending)
         {
-            uinnt32_to_serial3('C');
-            delay(50);
-            uinnt32_to_serial3(cPKey);
-            delay(50);
+
+
+            Serial3.write('C');
+
+            uinnt32_to_serial3(cPKey); 
+            Serial.println(cPKey);
             uinnt32_to_serial3(cMod);
-            delay(2000);
-            // if (millis() - time >= 1000)
-            // {
-            //     state = sending;
-            // }
-            // else if(uinnt32_from_serial3() == 'A')
-            // {
-            //     uinnt32_to_serial3('A');
-            //     state = ready;
-            // }
+            Serial.println(cMod);
+            wait_on_serial3(4,1000);
+           
+
+            if(ack == 'A')
+            {
+                Serial.println("A found");
+                delay(50);
+
+                sPkey = uinnt32_from_serial3();
+                sMod = uinnt32_from_serial3();
+                Serial.println(sPkey);
+                Serial.println(sMod);
+                delay(50);
+                ackFound = true;
+                Serial3.write('A');
+            
+
+                state = ready;
+                
+            }
         }
 
     }
 
 }
-
 //COde for serverHandshake; hopefully it works
 void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
 {
