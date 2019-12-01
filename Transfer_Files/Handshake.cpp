@@ -293,15 +293,15 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t &sPkey, uint32_t &sMod)
             wait_on_serial3(1, 1000);
             ack = Serial3.read();
             if(ack == 'A')
-            {
+            {   
+                //Dealy simply to slow reading from buffer to gaurentee
+                //key values are sitting in buffer
+                delay(50);
                 sPkey = uinnt32_from_serial3();
                 sMod = uinnt32_from_serial3();
                 ackFound = true;
                 Serial3.write('A');
-
-
                 state = ready;
-
             }
         }
         if (state == ready)
@@ -313,7 +313,8 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t &sPkey, uint32_t &sMod)
     }
 
 }
-//COde for serverHandshake; hopefully it works
+//Code for ServeShake. Many thing occur within as it traveses a finite state 
+//based code to determine what state it will sit in
 void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
 {
     enum serverState
@@ -329,24 +330,25 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
     {
         if (state == listen)
         {
+            //resets to false incase of timout errors
             keySent = false;
             keyRec = false;
             Serial.println("Waiting for connection request...");
             uint32_t read = Serial3.read();
-            // timeout check, will be seeing this alot
-            if (wait_on_serial3(1, 499) == false)
+            // timeout time set to 999 instead of 1 second to prevent
+            //a accidental perfect sync in which both devices are acting at the same
+            //instant in time
+            if (wait_on_serial3(1, 999) == false)
             {
                 state = listen;
             }
-
+            //Checks for c character moves state to key wait state 
             else if (read == 67)
             {
                 state = keyWait;
                 Serial.println("Request found!");
             }
-
         }
-
         if (state == keyWait)
         {
             Serial.println("Waiting for key and mod...");
@@ -357,23 +359,20 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
             }
             if (keyRec == false)
             {
-
-                cKey  = uinnt32_from_serial3();
+                cKey = uinnt32_from_serial3();
                 cMod = uinnt32_from_serial3();
                 Serial3.write('A');
                 if (keySent == false)
                 {
                     uinnt32_to_serial3(sKey);
                     uinnt32_to_serial3(sMod);
+                    //Only allows for one copy of keys to be sent across buffer
                     keySent = true;
                 }
                 keyRec = true;
                 state = ackWait;
-
             }
-
         }
-
         if (state == ackWait)
         {
             Serial.println("Waiting for acknowledgment...");
@@ -391,7 +390,6 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
                 Serial.println("Acknowledgment found!");
                 delay(50);
                 state = ready;
-
             }
             else if (ack == 67)
             {
@@ -406,20 +404,16 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
                 delay(50);
                 state = listen;
             }
-
         }
         if (state == ready)
         {
             Serial.println("Chat is Set. Enjoy your communictaion!");
             delay(50);
         }
-
     }
-
 }
 int main()
 {
-
     setup();
     int32_t d = 0;
     uint32_t pubKey = 0;
@@ -431,37 +425,20 @@ int main()
     {
         Serial.println("Arduino chat: Server!");
         // For some reason we need this delay IT IS SACRED CODE!
+        delay(25);
         keyGeneration(d, pubKey, n);
-        Serial.print("d = ");
-        Serial.println(d);
-        Serial.print("pubKey = ");
-        Serial.println(pubKey);
-        Serial.print("n = ");
-        Serial.println(n);
-        delay(50);
         serverShake(pubKey, n, e, m);
-        Serial.println(e);
-        Serial.println(m);
-        delay(50);
-
     }
     if (val == 0)
     {
         Serial.println("Arduino chat: Client!");
         // For some reason we need this delay IT IS SACRED CODE!
+        delay(25);
         keyGeneration(d, pubKey, n);
-        Serial.print("d = ");
-        Serial.println(d);
-        Serial.print("pubKey = ");
-        Serial.println(pubKey);
-        Serial.print("n = ");
-        Serial.println(n);
-        delay(50);
         clientShake(pubKey, n, e, m);
-        Serial.println(e);
-        Serial.println(m);
-        delay(50);
     }
+    //Devices cannot exit ready state once either recognizes a chat has begun both
+    //will require reset to restablish connection
     while (true)
     {
         reader(e, d, m, n);
