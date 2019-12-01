@@ -140,22 +140,22 @@ bool isPrime(uint32_t value){
     return isPrime;
 }
 //Uses is prime function to test if a value is prime
-// uint32_t testPrime(uint32_t val){
-//     bool prime = 0;
-//     if (isPrime(val)==true){
-//             return prime;
-//         }
-//     return !prime;
-// }
+uint32_t testPrime(uint32_t val){
+    bool prime = 0;
+    if (isPrime(val)==true){
+            return prime;
+        }
+    return !prime;
+}
 //Repeatedly tests a random value to see if it is prime
 //if not prime it will regenerate
 uint32_t findPrime(){
-    bool isNotPrime = 1;
+    bool isNotPrime = 0;
     uint32_t val = 0;
-    while (isNotPrime){
+    while (!isNotPrime){
         val = customRand(14);
-        if (isPrime(val) == 0){
-            isNotPrime = 0;
+        if (isPrime(val) == 1){
+            isNotPrime = 1;
         }
     }
     return val;
