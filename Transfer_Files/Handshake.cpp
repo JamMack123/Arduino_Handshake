@@ -206,7 +206,7 @@ int32_t findD(uint32_t phi, uint32_t e){
  return 0;
 }
 //USes pass by reference to create one function to return all the keys
-uint32_t keyGeneration(uint32_t& d, uint32_t& pubKey, uint32_t& n){
+uint32_t keyGeneration(int32_t& d, uint32_t& pubKey, uint32_t& n){
     uint32_t p = findPrime();
     uint32_t q = findPrime();
     n = p*q;
@@ -217,12 +217,14 @@ uint32_t keyGeneration(uint32_t& d, uint32_t& pubKey, uint32_t& n){
     pubKey  = e;
     d = findD(phi,e);
     if (d < 0){
+        Serial.println("Fixing>>>");
+        delay(50);
         int32_t z = ((-d)/(phi))+1;
         int32_t fix = -1;
         while(fix < 0){
             fix = (d + z*phi)%phi;
         }
-        d = fix;
+        d = fix%phi;
     }
     return d;
 }
@@ -399,7 +401,7 @@ int main()
 {
 
     setup();
-    uint32_t d =0;
+    int32_t d =0;
     uint32_t pubKey =0;
     uint32_t n = 0;
     uint32_t e =0;
