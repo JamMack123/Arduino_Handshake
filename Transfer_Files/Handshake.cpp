@@ -8,9 +8,11 @@ void setup()
     pinMode(13, INPUT);
     digitalWrite(13, LOW);
 }
+
+// mulmod from eclass
 uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m) {
     uint32_t result = 0;
-    uint32_t dblVal = a%m;
+    uint32_t dblVal = a % m;
     uint32_t newB = b;
 
     // This is the result of working through the worksheet.
@@ -25,6 +27,8 @@ uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m) {
 
     return result;
 }
+
+// powmod from eclass
 
 /* Calculates the value to the power of e using fast exponetiation*/
 uint32_t powMod(uint32_t a, uint32_t b, uint32_t m) {
@@ -101,6 +105,7 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
 BEGGINING OF PART 2 CODE FUNCTION IMPLEMENETATION
 ************************************************/
 
+
 //Reads the o analog pin and uses the read value to randomly 
 //create a fifteen bit number
 uint32_t customRand(uint32_t k){
@@ -133,7 +138,7 @@ bool isPrime(uint32_t value){
         isPrime = false;
     }
     for (uint32_t i = 2; i < bound_val; i++){
-        if (value%i == 0){
+        if (value % i == 0){
             isPrime = false;
         }
     }
@@ -175,7 +180,7 @@ uint32_t gcd_euclid_fast(uint32_t a, uint32_t b) {
 //e that is co-prime to phi(n)
 uint32_t findE (uint32_t phi){
     uint32_t e = customRand(14);
-    while(gcd_euclid_fast(e,phi)!=1){
+    while(gcd_euclid_fast(e,phi) != 1){
         e = customRand(14);
     }
     return e;
@@ -205,19 +210,18 @@ int32_t findD(uint32_t phi, uint32_t e){
  }
  return 0;
 }
-//USes pass by reference to create one function to return all the keys
-uint32_t keyGeneration(int32_t& d, uint32_t& pubKey, uint32_t& n){
+//Uses pass by reference to generate and return all the keys
+uint32_t keyGeneration(int32_t& d, uint32_t& e, uint32_t& n){
     uint32_t p = findPrime();
     uint32_t q = findPrime();
     n = p*q;
     uint32_t p1 = (p-1);
     uint32_t q1 = (q-1);
+    // the phi variable corrosponds to phi(n)
     uint32_t phi = p1*q1;
-    uint32_t e = findE(phi);
-    pubKey  = e;
+    e = findE(phi); 
     d = findD(phi,e);
     if (d < 0){
-        Serial.println("Fixing>>>");
         delay(50);
         int32_t z = ((-d)/(phi))+1;
         int32_t fix = -1;
@@ -230,7 +234,7 @@ uint32_t keyGeneration(int32_t& d, uint32_t& pubKey, uint32_t& n){
 }
 
 /**********************************************************************
-The following few functions relate to the intiale handshake between the
+The following few functions relate to the handshake between the
 Client and the server
 ************************************************************************/
 
@@ -258,28 +262,33 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t& sPkey, uint32_t& sMod)
     {
         sending, ready
     };
+
+    // ack will keep track of the
+    // acknowlege character 'A'
     uint32_t ack;
     bool ackFound = false;
     clientState state = sending;
     while (state != ready)
     {
-         ack = uinnt32_from_serial3();
-        //Serial.println("Sending keys ");
         if (state == sending)
         {
+
+        	// repeadly sent 'C' and our public key and mod
+        	// until we get 'A'
             Serial3.write('C');
             uinnt32_to_serial3(cPKey); 
             uinnt32_to_serial3(cMod);
-            wait_on_serial3(4,1000);
+            wait_on_serial3(1,1000);
+            ack = Serial3.read();
             if(ack == 'A')
             {
-                Serial.println("A found");
+            	// after we get 'A', get 
+            	// the servers key and mod and
+            	// then send our own 'A' 
                 delay(50);
 
                 sPkey = uinnt32_from_serial3();
                 sMod = uinnt32_from_serial3();
-                Serial.println(sPkey);
-                Serial.println(sMod);
                 delay(50);
                 ackFound = true;
                 Serial3.write('A');
@@ -297,7 +306,7 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t& sPkey, uint32_t& sMod)
     }
 
 }
-//COde for serverHandshake; hopefully it works
+//Code for serverHandshake; hopefully it works
 void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
 {
     enum serverState
@@ -305,21 +314,28 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
         listen, keyWait, ackWait, ready
     };
     serverState state = listen;
+
+    // keyRec keeps track off whether or not we have
+    // recived the clients key and mod.
     bool keyRec = false;
     bool keySent = false;
-    uint32_t time;
-
     while (state != ready)
     {
         if (state == listen)
         {
+
+        	// setting keySent and keyRec
+        	// to false, since whenever we time out
+        	// and end up back here, we want to
+        	// start from scratch.
             keySent = false;
             keyRec = false;
             Serial.println("Waiting for connection request...");
             uint32_t read = Serial3.read();
-            // timeout check, will be seeing this alot
-            if (wait_on_serial3(1, 499)==false)
+
+            if (wait_on_serial3(1, 1000) == false)
             {
+            	// timed out, start over
                 state = listen;
             }
 
@@ -334,17 +350,19 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
         if (state == keyWait)
         {
             Serial.println("Waiting for key and mod...");
-            // waiting for the key
             if(wait_on_serial3(4, 1000)==false)
             {
                 state = listen;
             }
-            if (keyRec==false){
-                
-                cKey  = uinnt32_from_serial3();
+            if (keyRec == false){
+                // get key and mod if we
+                // haven't already
+                cKey = uinnt32_from_serial3();
                 cMod = uinnt32_from_serial3();
                 uinnt32_to_serial3('A');
                 if (keySent == false){
+                	// send key and mod if we
+               		// haven't already
                     uinnt32_to_serial3(sKey);
                     uinnt32_to_serial3(sMod);
                     keySent = true;
@@ -358,11 +376,10 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
 
         if (state == ackWait)
         {
-            Serial.println("Waiting for ack...");
-            wait_on_serial3(4,250);
+            Serial.println("Waiting for acknowledge character...");
             uint32_t ack = 0;
             ack = Serial3.read();
-            if (wait_on_serial3(0, 1000)==false)
+            if (wait_on_serial3(0, 1000) == false)
             {
                 Serial.println("System Timed out: restarting");
                 keyRec = false;
@@ -383,7 +400,7 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t& cKey, uint32_t& cMod )
                 state = keyWait;
             }
             else if (ack >= 1){
-                Serial.println("Incorrect term recieved: restarting");
+                Serial.println("Invalid character recieved: restarting");
                 delay(50);
                 state = listen;
             }
@@ -401,62 +418,39 @@ int main()
 {
 
     setup();
-    int32_t d =0;
+    int32_t d = 0;
     uint32_t pubKey =0;
     uint32_t n = 0;
-    uint32_t e =0;
-    uint32_t m =0;
-    uint32_t val =digitalRead(13);
+    uint32_t e = 0;
+    uint32_t m = 0;
+    uint32_t val = digitalRead(13);
     if (val == 1)
     {
         Serial.println("Arduino chat: Server!");
-        // For some reason we need this delay IT IS SACRED CODE!
         keyGeneration(d,pubKey,n);
-        Serial.print("d = ");
-        Serial.println(d);
-        Serial.print("pubKey = ");
-        Serial.println(pubKey);
-        Serial.print("n = ");
-        Serial.println(n);
+
+        // For some reason we need this delay 
         delay(50);
+        // exchanging keys
         serverShake(pubKey,n,e,m);
-        Serial.println(e);
-        Serial.println(m);
         delay(50);
 
     }
     if (val == 0)
     {
         Serial.println("Arduino chat: Client!");
-        // For some reason we need this delay IT IS SACRED CODE!
+
         keyGeneration(d,pubKey,n);
-        Serial.print("d = ");
-        Serial.println(d);
-        Serial.print("pubKey = ");
-        Serial.println(pubKey);
-        Serial.print("n = ");
-        Serial.println(n);
+
+        // For some reason we need this delay
         delay(50);
+        // exchanging keys
         clientShake(pubKey, n, e,m);
-        Serial.println(e);
-        Serial.println(m);
         delay(50);
     }
- while (true)
+    while (true)
     {
-        //Using state given from setup
-        //intialize values the device needs
-        if (val == 1)
-        {
-            //intializes the server side values
-            reader(e,d,m,n);
-        }
-        else
-        {
-            //intializes the client side values
-            reader(e, d, m,n);
-        }
-
+    	reader(e,d,m,n);
     }
 
 }
