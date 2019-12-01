@@ -140,22 +140,22 @@ bool isPrime(uint32_t value){
     return isPrime;
 }
 //Uses is prime function to test if a value is prime
-uint32_t testPrime(uint32_t val){
-    bool prime = 0;
-    if (isPrime(val)==true){
-            return prime;
-        }
-    return !prime;
-}
+// uint32_t testPrime(uint32_t val){
+//     bool prime = 0;
+//     if (isPrime(val)==true){
+//             return prime;
+//         }
+//     return !prime;
+// }
 //Repeatedly tests a random value to see if it is prime
 //if not prime it will regenerate
 uint32_t findPrime(){
-    bool notGoingToTakeIt = 1;
+    bool isNotPrime = 1;
     uint32_t val = 0;
-    while (notGoingToTakeIt){
+    while (isNotPrime){
         val = customRand(14);
-        if (testPrime(val) == 0){
-            notGoingToTakeIt = 0;
+        if (isPrime(val) == 0){
+            isNotPrime = 0;
         }
     }
     return val;
@@ -188,14 +188,11 @@ int32_t findD(uint32_t phi, uint32_t e){
     int32_t q;
     r[0] = phi;
     r[1] = e;
-    s[0] = 1;
-    s[1] = 0;
     t[0] = 0;
     t[1] = 1;
     for (int i = 1; r[i]>0; i++){
         q = r[i-1]/r[i];
         r[i+1] = r[i-1] - q*r[i];
-        s[i+1] = s[i-1] - q*s[i];
         t[i+1] = t[i-1] - q*t[i];
     }
     for(int i = 0; i < 40; i++){
@@ -206,15 +203,14 @@ int32_t findD(uint32_t phi, uint32_t e){
  return 0;
 }
 //USes pass by reference to create one function to return all the keys
-uint32_t keyGeneration(int32_t& d, uint32_t& pubKey, uint32_t& n){
+uint32_t keyGeneration(int32_t& d, uint32_t& e, uint32_t& n){
     uint32_t p = findPrime();
     uint32_t q = findPrime();
     n = p*q;
     uint32_t p1 = (p-1);
     uint32_t q1 = (q-1);
     uint32_t phi = p1*q1;
-    uint32_t e = findE(phi);
-    pubKey  = e;
+    e = findE(phi);
     d = findD(phi,e);
     if (d < 0){
         Serial.println("Fixing>>>");
