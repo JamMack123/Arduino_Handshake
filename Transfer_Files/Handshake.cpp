@@ -8,41 +8,40 @@ void setup()
     pinMode(13, INPUT);
     digitalWrite(13, LOW);
 }
-uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m)
-{
-    uint32_t sum = 0;
-    //Keeps removing least significant bit of a until no bits remain
-    // If the ith bit in a is 1 it will add b*2^i to the sum mation
-    while(a != 0)
-    {
-        if (a & 1)
-        {
-            sum = (sum+b)%m;
+uint32_t mulmod(uint32_t a, uint32_t b, uint32_t m) {
+    uint32_t result = 0;
+    uint32_t dblVal = a%m;
+    uint32_t newB = b;
+
+    // This is the result of working through the worksheet.
+    // Notice the extreme similarity with powmod.
+    while (newB > 0) {
+        if (newB & 1) {
+            result = (result + dblVal) % m;
         }
-        //Removes the least significant bit of a to decrease
-        //a total value
-        a = (a>>1)%m;
-        //Multiplies b by 2 i times i being the number of bits
-        //in a
-        b = b * 2 % m;
+        dblVal = (dblVal << 1) % m;
+        newB = (newB >> 1);
     }
-    return sum % m;
+
+    return result;
 }
+
 /* Calculates the value to the power of e using fast exponetiation*/
-uint32_t powMod(uint32_t value, uint32_t e, uint32_t modulus)
-{
-    //Intalized as 1 so subsequent multiplications do not fail
-    uint32_t ans = 1;
-    while (e != 0)
-    {
-        if (e & 1 != 0)
-        {
-            ans = mulmod(ans, value, modulus);
+uint32_t powMod(uint32_t a, uint32_t b, uint32_t m) {
+    uint32_t result = 1 % m;
+    uint32_t sqrVal = a % m;  // stores a^{2^i} values, initially 2^{2^0}
+    uint32_t newB = b;
+
+    // See the lecture notes for a description of why this works.
+    while (newB > 0) {
+        if (newB & 1) {  // evalutates to true iff i'th bit of b is 1 in the i'th iteration
+            result = mulmod(result, sqrVal, m);
         }
-        value = mulmod(value, value, modulus);
-        e = e / 2;
+        sqrVal = mulmod(sqrVal, sqrVal, m);
+        newB = (newB >> 1);
     }
-    return ans;
+
+    return result;
 }
 
 /* * Writes an uint32_t to Serial3 , starting from the least - significant
@@ -201,7 +200,7 @@ int32_t findD(uint32_t phi, uint32_t e){
     }
     for(int i = 0; i < 40; i++){
             if (r[i] == 0){
-                return s[i-1];
+                return t[i-1];
         }
  }
  return 0;
@@ -448,7 +447,7 @@ int main()
         if (val == 1)
         {
             //intializes the server side values
-            reader(e,d,n,m);
+            reader(e,d,m,n);
         }
         else
         {
