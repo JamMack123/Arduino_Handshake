@@ -84,9 +84,7 @@ void reader(uint32_t e, uint32_t d, uint32_t m, uint32_t n)
         if (byte_read == 13)
         {
             Serial.write("\r\n");
-            uint32_t encypted1 = powMod(13, e, m);
             uint32_t encypted2 = powMod(10, e, m);
-            uinnt32_to_serial3(encypted1);
             uinnt32_to_serial3(encypted2);
         }
         //Sends inputted text to Serial 3 after encyrption
