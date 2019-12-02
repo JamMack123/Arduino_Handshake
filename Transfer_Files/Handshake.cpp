@@ -292,7 +292,8 @@ void clientShake(uint32_t cPKey, uint32_t cMod, uint32_t &sPkey, uint32_t &sMod)
             Serial3.write('C');
             uinnt32_to_serial3(cPKey);
             uinnt32_to_serial3(cMod);
-
+            //This is used instead of the wait on serial 3 so it doesn't matter
+            //if there is data in the buffer until 'A' is read, this will send keys every second
             delay(1000);
             ack = Serial3.read();
             Serial3.flush();
@@ -366,9 +367,9 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
             if (keyRec == false)
             {
                 if (Serial3.available() >= 8){
-                cKey = uinnt32_from_serial3();
-                cMod = uinnt32_from_serial3();
-                Serial3.write('A');
+                    cKey = uinnt32_from_serial3();
+                    cMod = uinnt32_from_serial3();
+                    Serial3.write('A');
             }
                 if (keySent == false)
                 {
