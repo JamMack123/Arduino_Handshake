@@ -359,14 +359,16 @@ void serverShake(uint32_t sKey, uint32_t sMod, uint32_t &cKey, uint32_t &cMod )
             Serial.println("Waiting for key and mod...");
             if(wait_on_serial3(4, 1000) == false)
             {
-            	// timeout
+                // timeout
                 state = listen;
             }
             if (keyRec == false)
             {
+                if (Serial3.available()>=8){
                 cKey = uinnt32_from_serial3();
                 cMod = uinnt32_from_serial3();
                 Serial3.write('A');
+            }
                 if (keySent == false)
                 {
                     uinnt32_to_serial3(sKey);
